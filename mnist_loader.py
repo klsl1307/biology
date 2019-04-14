@@ -57,8 +57,38 @@ def load_data_wrapper():
     turn out to be the most convenient for use in our neural network
     code."""
     # tr_d, va_d, te_d = load_data()
-    img = np.array(Image.open('../off_edge/4/0-0-0-0-0-0.bmp-100-10.bmp'))
-    print(img)
+    inputs = []
+    results = []
+
+    for line in open('../on_edge.txt'):
+    	img = np.array(Image.open('../on_edge/4/' + line))
+        inputs.append(np.reshape(img, (25, 1)))
+    	results.append([vectorized_result(0)]
+
+    for line in open('../off_edge.txt'):
+    	img = np.array(Image.open('../off_edge/4/' + line))
+        inputs.append(np.reshape(img, (25, 1)))
+    	results.append([vectorized_result(1)]
+
+    for line in open('../on_corner.txt'):
+    	img = np.array(Image.open('../on_corner/4/' + line))
+        inputs.append(np.reshape(img, (25, 1)))
+    	results.append([vectorized_result(2)]
+
+    index = [i for i in range(len(inputs))]  
+	random.shuffle(index) 
+	inputs = inputs[index]
+	results = results[index]
+
+	training_inputs = inputs[0:int(0.7*len(inputs))]
+	training_results = results[0:int(0.7*len(results))]
+	test_inputs = inputs[int(0.7*len(inputs)):]
+	test_results = [x.index(1.0) for x in results[int(0.7*len(results)):]]
+
+    training_data = zip(training_inputs, training_results)
+    validation_data = []
+    test_data = zip(test_inputs, test_results)
+    return (training_data, validation_data, test_data)
     
     # training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]]
     # training_results = [vectorized_result(y) for y in tr_d[1]]
@@ -74,8 +104,7 @@ def vectorized_result(j):
     position and zeroes elsewhere.  This is used to convert a digit
     (0...9) into a corresponding desired output from the neural
     network."""
-    e = np.zeros((10, 1))
+    e = np.zeros((3, 1))
     e[j] = 1.0
     return e
 
-load_data_wrapper()
